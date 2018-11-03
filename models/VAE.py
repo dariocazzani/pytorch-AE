@@ -11,7 +11,7 @@ from datasets import MNIST, EMNIST, FashionMNIST
 class Network(nn.Module):
     def __init__(self, args):
         super(Network, self).__init__()
-        output_size = 1024
+        output_size = 512
         self.encoder = CNN_Encoder(output_size)
         self.var = nn.Linear(output_size, args.embedding_size)
         self.mu = nn.Linear(output_size, args.embedding_size)
