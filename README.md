@@ -7,10 +7,17 @@
 
 This repo contains an implementation of the following AutoEncoders:
 
-* [Variational AutoEncoders - **VAE**](): blahblah
-* [Vanilla AutoEncoders - **AE**](): blahblah
-* [Adversarially Constrained Autoencoder Interpolations - **ACAI**](https://arxiv.org/pdf/1807.07543)
+* [Vanilla AutoEncoders - **AE**](http://ufldl.stanford.edu/tutorial/unsupervised/Autoencoders/): </br>
+  The most basic autoencoder structure is one which simply maps input data-points through a __bottleneck layer__ whose dimensionality is smaller than the input.
 
+* [Variational AutoEncoders - **VAE**](): </br>
+  The Variational Autoencoder introduces the constraint
+that the latent code `z` is a random variable distributed according to a prior distribution `p(z)`.
+
+* [Adversarially Constrained Autoencoder Interpolations - **ACAI**](https://arxiv.org/pdf/1807.07543):</br>
+A critic network tries to predict the interpolation coefficient α corresponding to an interpolated datapoint. The autoencoder is
+trained to fool the critic into outputting α = 0.</br>
+![ACAI-figure](assets/ACAI-figure.png)
 
 ### Create a Python Virtual Environment
 ```
