@@ -15,12 +15,18 @@ def get_interpolations(model, device, images, images_per_row=20):
         embeddings = model.reparameterize(mu, logvar).cpu()
 
         interps = []
-        for i in range(0, (images_per_row-2)*2, 2):
+        for i in range(0, images_per_row+1, 1):
             interp = interpolate(embeddings[i], embeddings[i+1], images_per_row-4)
             interp = interp.to(device)
             interp_dec = model.decode(interp)
             line = torch.cat((images[i].view(-1, 784), interp_dec, images[i+1].view(-1, 784)))
             interps.append(line)
+        # Complete the loop and append the first image again
+        interp = interpolate(embeddings[i+1], embeddings[0], images_per_row-4)
+        interp = interp.to(device)
+        interp_dec = model.decode(interp)
+        line = torch.cat((images[i+1].view(-1, 784), interp_dec, images[0].view(-1, 784)))
+        interps.append(line)
 
         interps = torch.cat(interps, 0).to(device)
     return interps
