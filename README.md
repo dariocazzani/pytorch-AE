@@ -32,7 +32,7 @@ mkvirtualenv --python=/usr/bin/python3 pytorch-AE
 
 ###  Install dependencies
 ```
-pip install tensorflow
+pip install torch torchvision
 ```
 
 -------------------------
