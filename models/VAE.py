@@ -2,32 +2,21 @@ import torch
 import torch.utils.data
 from torch import nn, optim
 from torch.nn import functional as F
-from torchvision import datasets, transforms
 
 import sys
 sys.path.append('../')
 from architectures import FC_Encoder, FC_Decoder, CNN_Encoder, CNN_Decoder
-
-class MNIST(object):
-    def __init__(self, args):
-        kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
-        self.train_loader = torch.utils.data.DataLoader(
-            datasets.MNIST('data', train=True, download=True,
-                           transform=transforms.ToTensor()),
-            batch_size=args.batch_size, shuffle=True, **kwargs)
-        self.test_loader = torch.utils.data.DataLoader(
-            datasets.MNIST('data', train=False, transform=transforms.ToTensor()),
-            batch_size=args.batch_size, shuffle=True, **kwargs)
+from datasets import MNIST, EMNIST, FashionMNIST
 
 class Network(nn.Module):
     def __init__(self, args):
         super(Network, self).__init__()
         output_size = 1024
-        self.encoder = FC_Encoder(output_size)
+        self.encoder = CNN_Encoder(output_size)
         self.var = nn.Linear(output_size, args.embedding_size)
         self.mu = nn.Linear(output_size, args.embedding_size)
 
-        self.decoder = FC_Decoder(args.embedding_size)
+        self.decoder = CNN_Decoder(args.embedding_size)
 
     def encode(self, x):
         x = self.encoder(x)
@@ -50,13 +39,24 @@ class VAE(object):
     def __init__(self, args):
         self.args = args
         self.device = torch.device("cuda" if args.cuda else "cpu")
-        data = MNIST(args)
-        self.train_loader = data.train_loader
-        self.test_loader = data.test_loader
+        self._init_dataset()
+        self.train_loader = self.data.train_loader
+        self.test_loader = self.data.test_loader
 
         self.model = Network(args)
         self.model.to(self.device)
         self.optimizer = optim.Adam(self.model.parameters(), lr=1e-3)
+
+    def _init_dataset(self):
+        if self.args.dataset == 'MNIST':
+            self.data = MNIST(self.args)
+        elif self.args.dataset == 'EMNIST':
+            self.data = EMNIST(self.args)
+        elif self.args.dataset == 'FashionMNIST':
+            self.data = FashionMNIST(self.args)
+        else:
+            print("Dataset not supported")
+            sys.exit()
 
     # Reconstruction + KL divergence losses summed over all elements and batch
     def loss_function(self, recon_x, x, mu, logvar):

@@ -42,7 +42,7 @@ pip install tensorflow
 python train.py --help
 ```
 
-### Training Options:
+### Training Options and some examples:
 
 * **Vanilla Autoencoder:**
   ```
@@ -51,7 +51,7 @@ python train.py --help
 
 * **Variational Autoencoder:**
   ```
-  python train.py --model VAE
+  python train.py --model VAE --batch-size 512 --dataset EMNIST --seed 42 --log-interval 500 --epochs 5 --embedding-size 128
   ```
 
 -------------------------

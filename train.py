@@ -8,6 +8,7 @@ from torchvision.utils import save_image
 
 from models.VAE import VAE
 from models.AE import AE
+
 from utils import get_interpolations
 
 parser = argparse.ArgumentParser(
@@ -28,6 +29,9 @@ parser.add_argument('--results_path', type=str, default='results/', metavar='N',
                     help='Where to store images')
 parser.add_argument('--model', type=str, default='AE', metavar='N',
                     help='Which architecture to use')
+parser.add_argument('--dataset', type=str, default='MNIST', metavar='N',
+                    help='Which dataset to use')
+
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 torch.manual_seed(args.seed)
@@ -53,9 +57,12 @@ if __name__ == "__main__":
         print('---------------------------------------------------------')
         sys.exit()
 
-    for epoch in range(1, args.epochs + 1):
-        autoenc.train(epoch)
-        autoenc.test(epoch)
+    try:
+        for epoch in range(1, args.epochs + 1):
+            autoenc.train(epoch)
+            autoenc.test(epoch)
+    except (KeyboardInterrupt, SystemExit):
+        print("Manual Interruption")
 
     with torch.no_grad():
         images, _ = next(iter(autoenc.test_loader))
@@ -66,11 +73,11 @@ if __name__ == "__main__":
         sample = torch.randn(64, args.embedding_size).to(autoenc.device)
         sample = autoenc.model.decode(sample).cpu()
         save_image(sample.view(64, 1, 28, 28),
-                '{}/sample_{}.png'.format(args.results_path, args.model))
+                '{}/sample_{}_{}.png'.format(args.results_path, args.model, args.dataset))
         save_image(interpolations.view(-1, 1, 28, 28),
-                '{}/interpolations_{}.png'.format(args.results_path, args.model),  nrow=images_per_row)
+                '{}/interpolations_{}_{}.png'.format(args.results_path, args.model, args.dataset),  nrow=images_per_row)
         interpolations = interpolations.cpu()
         interpolations = np.reshape(interpolations.data.numpy(), (-1, 28, 28))
         interpolations = ndimage.zoom(interpolations, 5, order=1)
         interpolations *= 256
-        imageio.mimsave('{}/animation_{}.gif'.format(args.results_path, args.model), interpolations.astype(np.uint8))
+        imageio.mimsave('{}/animation_{}_{}.gif'.format(args.results_path, args.model, args.dataset), interpolations.astype(np.uint8))
