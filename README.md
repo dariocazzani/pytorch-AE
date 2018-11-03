@@ -3,6 +3,8 @@
 [![dep2](https://img.shields.io/badge/PyTorch-0.4.1-orange.svg)](https://pytorch.org/)
 ![dep1](https://img.shields.io/badge/Status-Work--in--Progress-brightgreen.svg)
 
+-------------------------
+
 ## Description
 
 This repo contains an implementation of the following AutoEncoders:
@@ -19,6 +21,10 @@ A critic network tries to predict the interpolation coefficient α corresponding
 trained to fool the critic into outputting α = 0.</br>
 ![ACAI-figure](assets/ACAI-figure.png)
 
+-------------------------
+
+## Setup
+
 ### Create a Python Virtual Environment
 ```
 mkvirtualenv --python=/usr/bin/python3 pytorch-AE
@@ -28,6 +34,36 @@ mkvirtualenv --python=/usr/bin/python3 pytorch-AE
 ```
 pip install tensorflow
 ```
+
+-------------------------
+
+## Training
+```
+python train.py --help
+```
+
+### Training Options:
+
+* **Vanilla Autoencoder:**
+  ```
+  python train.py --model AE
+  ```
+
+* **Variational Autoencoder:**
+  ```
+  python train.py --model VAE
+  ```
+
+-------------------------
+
+## Results
+
+Interpolations for VAE        |  Interpolations for AE
+:----------------------------:|:-------------------------:
+![](assets/animation_VAE.gif) |  ![](interpolations_VAE.png)
+:----------------------------:|:-------------------------:
+![](assets/animation_VAE.gif) |  ![](interpolations_VAE.png)
+
 
 ### Contributing:
 If you have suggestions or any type of contribution idea, file an issue, make a PR
