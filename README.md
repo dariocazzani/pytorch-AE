@@ -58,11 +58,10 @@ python train.py --help
 
 ## Results
 
-Interpolations for VAE        |  Interpolations for AE
-:----------------------------:|:-------------------------:
-![](assets/animation_VAE.gif) |  ![](interpolations_VAE.png)
-:----------------------------:|:-------------------------:
-![](assets/animation_VAE.gif) |  ![](interpolations_VAE.png)
+| Vanilla AutoEncoders       |  Variational AutoEncoders  | ACAI          |
+|------------------------- |------------------------- | --------------------|
+| <img src="assets/interpolations_VAE.png" width="250" height="250" />  | <img src="assets/interpolations_VAE.png" width="250" height="250" /> | <img src="assets/interpolations_VAE.png" width="250" height="250" />|
+
 
 
 ### Contributing:
