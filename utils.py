@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-def get_interpolations(model, device, images, images_per_row=20):
+def get_interpolations(args, model, device, images, images_per_row=20):
     model.eval()
     with torch.no_grad():
         def interpolate(t1, t2, num_interps):
@@ -11,9 +11,12 @@ def get_interpolations(model, device, images, images_per_row=20):
                 interps.append(a*t2.view(1, -1) + (1 - a)*t1.view(1, -1))
             return torch.cat(interps, 0)
 
-        mu, logvar = model.encode(images.view(-1, 784))
-        embeddings = model.reparameterize(mu, logvar).cpu()
-
+        if args.model == 'VAE':
+            mu, logvar = model.encode(images.view(-1, 784))
+            embeddings = model.reparameterize(mu, logvar).cpu()
+        elif args.model == 'AE':
+            embeddings = model.encode(images.view(-1, 784))
+            
         interps = []
         for i in range(0, images_per_row+1, 1):
             interp = interpolate(embeddings[i], embeddings[i+1], images_per_row-4)

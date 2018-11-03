@@ -22,31 +22,22 @@ class MNIST(object):
 class Network(nn.Module):
     def __init__(self, args):
         super(Network, self).__init__()
-        output_size = 1024
-        self.encoder = FC_Encoder(output_size)
-        self.var = nn.Linear(output_size, args.embedding_size)
-        self.mu = nn.Linear(output_size, args.embedding_size)
+        output_size = args.embedding_size
+        self.encoder = CNN_Encoder(output_size)
 
-        self.decoder = FC_Decoder(args.embedding_size)
+        self.decoder = CNN_Decoder(args.embedding_size)
 
     def encode(self, x):
-        x = self.encoder(x)
-        return self.mu(x), self.var(x)
-
-    def reparameterize(self, mu, logvar):
-        std = torch.exp(0.5*logvar)
-        eps = torch.randn_like(std)
-        return eps.mul(std).add_(mu)
+        return self.encoder(x)
 
     def decode(self, z):
         return self.decoder(z)
 
     def forward(self, x):
-        mu, logvar = self.encode(x.view(-1, 784))
-        z = self.reparameterize(mu, logvar)
-        return self.decode(z), mu, logvar
+        z = self.encode(x.view(-1, 784))
+        return self.decode(z)
 
-class VAE(object):
+class AE(object):
     def __init__(self, args):
         self.args = args
         self.device = torch.device("cuda" if args.cuda else "cpu")
@@ -58,15 +49,9 @@ class VAE(object):
         self.model.to(self.device)
         self.optimizer = optim.Adam(self.model.parameters(), lr=1e-3)
 
-    # Reconstruction + KL divergence losses summed over all elements and batch
-    def loss_function(self, recon_x, x, mu, logvar):
+    def loss_function(self, recon_x, x):
         BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784), reduction='sum')
-        # see Appendix B from VAE paper:
-        # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
-        # https://arxiv.org/abs/1312.6114
-        # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
-        KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-        return BCE + KLD
+        return BCE
 
     def train(self, epoch):
         self.model.train()
@@ -74,8 +59,8 @@ class VAE(object):
         for batch_idx, (data, _) in enumerate(self.train_loader):
             data = data.to(self.device)
             self.optimizer.zero_grad()
-            recon_batch, mu, logvar = self.model(data)
-            loss = self.loss_function(recon_batch, data, mu, logvar)
+            recon_batch = self.model(data)
+            loss = self.loss_function(recon_batch, data)
             loss.backward()
             train_loss += loss.item()
             self.optimizer.step()
@@ -94,8 +79,8 @@ class VAE(object):
         with torch.no_grad():
             for i, (data, _) in enumerate(self.test_loader):
                 data = data.to(self.device)
-                recon_batch, mu, logvar = self.model(data)
-                test_loss += self.loss_function(recon_batch, data, mu, logvar).item()
+                recon_batch = self.model(data)
+                test_loss += self.loss_function(recon_batch, data).item()
 
         test_loss /= len(self.test_loader.dataset)
         print('====> Test set loss: {:.4f}'.format(test_loss))

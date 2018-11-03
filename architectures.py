@@ -6,15 +6,13 @@ from torch.autograd import Variable
 import numpy as  np
 
 class FC_Encoder(nn.Module):
-    def __init__(self, embedding_size):
+    def __init__(self, output_size):
         super(FC_Encoder, self).__init__()
-        self.fc1 = nn.Linear(784, 1024)
-        self.fc21 = nn.Linear(1024, embedding_size)
-        self.fc22 = nn.Linear(1024, embedding_size)
+        self.fc1 = nn.Linear(784, output_size)
 
     def forward(self, x):
         h1 = F.relu(self.fc1(x))
-        return self.fc21(h1), self.fc22(h1)
+        return h1
 
 class FC_Decoder(nn.Module):
     def __init__(self, embedding_size):
@@ -27,7 +25,7 @@ class FC_Decoder(nn.Module):
         return torch.sigmoid(self.fc4(h3))
 
 class CNN_Encoder(nn.Module):
-    def __init__(self, embedding_size, input_size=(1, 28, 28)):
+    def __init__(self, output_size, input_size=(1, 28, 28)):
         super(CNN_Encoder, self).__init__()
 
         self.input_size = input_size
@@ -48,13 +46,10 @@ class CNN_Encoder(nn.Module):
         self.flat_fts = self.get_flat_fts(self.conv)
 
         self.linear = nn.Sequential(
-            nn.Linear(self.flat_fts, 1024),
-            nn.BatchNorm1d(1024),
+            nn.Linear(self.flat_fts, output_size),
+            nn.BatchNorm1d(output_size),
             nn.LeakyReLU(0.2),
         )
-
-        self.mu = nn.Linear(1024, embedding_size)
-        self.var = nn.Linear(1024, embedding_size)
 
     def get_flat_fts(self, fts):
         f = fts(Variable(torch.ones(1, *self.input_size)))
@@ -63,8 +58,7 @@ class CNN_Encoder(nn.Module):
     def forward(self, x):
         x = self.conv(x.view(-1, *self.input_size))
         x = x.view(-1, self.flat_fts)
-        x = self.linear(x)
-        return self.mu(x), self.var(x)
+        return self.linear(x)
 
 class CNN_Decoder(nn.Module):
     def __init__(self, embedding_size, input_size=(1, 28, 28)):
