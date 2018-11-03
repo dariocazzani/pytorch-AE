@@ -11,8 +11,24 @@ This repo contains an implementation of the following AutoEncoders:
 * [Vanilla AutoEncoders - **AE**](): blahblah
 * [Adversarially Constrained Autoencoder Interpolations - **ACAI**](https://arxiv.org/pdf/1807.07543)
 
-### Requirements:
 
+### Create a Python Virtual Environment
 ```
-pip install -r requirements.txt
+mkvirtualenv --python=/usr/bin/python3 pytorch-AE
 ```
+
+###  Install dependencies
+```
+pip install tensorflow
+```
+
+### Contributing:
+If you have suggestions or any type of contribution idea, file an issue, make a PR
+and **don't forget to star the repository**
+
+### More projects:
+Feel free to check out my other repos with more work in Machine Learning:
+
+* [World Models in TensorFlow](https://github.com/dariocazzani/World-Models-TensorFlow)
+* [TensorBlob](https://github.com/dariocazzani/TensorBlob)
+* [banaNavigation](https://github.com/dariocazzani/banaNavigation)
