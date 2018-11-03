@@ -60,7 +60,7 @@ python train.py --help
 
 | Vanilla AutoEncoders       |  Variational AutoEncoders  | ACAI          |
 |------------------------- |------------------------- | --------------------|
-| <img src="assets/interpolations_AE.png" width="250" height="250" />  | <img src="assets/interpolations_VAE.png" width="250" height="250" /> | <img src="assets/interpolations_VAE.png" width="250" height="250" />|
+| <img src="assets/interpolations_AE.png" width="250" height="250" />  | <img src="assets/interpolations_VAE_2.png" width="250" height="250" /> | <img src="assets/interpolations_VAE.png" width="250" height="250" />|
 
 
 
