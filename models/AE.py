@@ -12,10 +12,10 @@ from datasets import MNIST, EMNIST, FashionMNIST
 class Network(nn.Module):
     def __init__(self, args):
         super(Network, self).__init__()
-        output_size = args.embedding_size
+        output_size = args["embedding_size"]
         self.encoder = CNN_Encoder(output_size)
 
-        self.decoder = CNN_Decoder(args.embedding_size)
+        self.decoder = CNN_Decoder(args["embedding_size"])
 
     def encode(self, x):
         return self.encoder(x)
@@ -30,7 +30,7 @@ class Network(nn.Module):
 class AE(object):
     def __init__(self, args):
         self.args = args
-        self.device = torch.device("cuda" if args.cuda else "cpu")
+        self.device = torch.device("cuda" if args["cuda"] else "cpu")
         self._init_dataset()
         self.train_loader = self.data.train_loader
         self.test_loader = self.data.test_loader
@@ -40,11 +40,11 @@ class AE(object):
         self.optimizer = optim.Adam(self.model.parameters(), lr=1e-3)
 
     def _init_dataset(self):
-        if self.args.dataset == 'MNIST':
+        if self.args["dataset"] == 'MNIST':
             self.data = MNIST(self.args)
-        elif self.args.dataset == 'EMNIST':
+        elif self.args["dataset"] == 'EMNIST':
             self.data = EMNIST(self.args)
-        elif self.args.dataset == 'FashionMNIST':
+        elif self.args["dataset"] == 'FashionMNIST':
             self.data = FashionMNIST(self.args)
         else:
             print("Dataset not supported")
@@ -65,7 +65,7 @@ class AE(object):
             loss.backward()
             train_loss += loss.item()
             self.optimizer.step()
-            if batch_idx % self.args.log_interval == 0:
+            if batch_idx % self.args["log_interval"] == 0:
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     epoch, batch_idx * len(data), len(self.train_loader.dataset),
                     100. * batch_idx / len(self.train_loader),

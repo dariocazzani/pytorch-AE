@@ -35,21 +35,23 @@ parser.add_argument('--dataset', type=str, default='MNIST', metavar='N',
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 torch.manual_seed(args.seed)
+args = vars(args)
+print(args)
 
 vae = VAE(args)
 ae = AE(args)
 architectures = {'AE':  ae,
                  'VAE': vae}
 
-print(args.model)
+print(args["model"])
 if __name__ == "__main__":
     try:
-        os.stat(args.results_path)
+        os.stat(args["results_path"])
     except :
-        os.mkdir(args.results_path)
+        os.mkdir(args["results_path"])
 
     try:
-        autoenc = architectures[args.model]
+        autoenc = architectures[args["model"]]
     except KeyError:
         print('---------------------------------------------------------')
         print('Model architecture not supported. ', end='')
@@ -58,7 +60,7 @@ if __name__ == "__main__":
         sys.exit()
 
     try:
-        for epoch in range(1, args.epochs + 1):
+        for epoch in range(1, args["epochs"] + 1):
             autoenc.train(epoch)
             autoenc.test(epoch)
     except (KeyboardInterrupt, SystemExit):
@@ -70,14 +72,14 @@ if __name__ == "__main__":
         images_per_row = 16
         interpolations = get_interpolations(args, autoenc.model, autoenc.device, images, images_per_row)
 
-        sample = torch.randn(64, args.embedding_size).to(autoenc.device)
+        sample = torch.randn(64, args["embedding_size"]).to(autoenc.device)
         sample = autoenc.model.decode(sample).cpu()
         save_image(sample.view(64, 1, 28, 28),
-                '{}/sample_{}_{}.png'.format(args.results_path, args.model, args.dataset))
+                '{}/sample_{}_{}.png'.format(args["results_path"], args["model"], args["dataset"]))
         save_image(interpolations.view(-1, 1, 28, 28),
-                '{}/interpolations_{}_{}.png'.format(args.results_path, args.model, args.dataset),  nrow=images_per_row)
+                '{}/interpolations_{}_{}.png'.format(args["results_path"], args["model"], args["dataset"]),  nrow=images_per_row)
         interpolations = interpolations.cpu()
         interpolations = np.reshape(interpolations.data.numpy(), (-1, 28, 28))
         interpolations = ndimage.zoom(interpolations, 5, order=1)
         interpolations *= 256
-        imageio.mimsave('{}/animation_{}_{}.gif'.format(args.results_path, args.model, args.dataset), interpolations.astype(np.uint8))
+        imageio.mimsave('{}/animation_{}_{}.gif'.format(args["results_path"], args["model"], args["dataset"]), interpolations.astype(np.uint8))
